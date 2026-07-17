@@ -6,6 +6,15 @@
 <meta property="og:title" content="Flow Media — Your A-to-Z Brand Partner">
 <meta property="og:description" content="From your first logo to the AI that answers your calls — one team that builds, shoots, and grows your brand end to end.">
 <meta property="og:type" content="website">
+<meta property="og:url" content="https://aaravsingh080.github.io/flowmedia/">
+<meta property="og:image" content="https://aaravsingh080.github.io/flowmedia/share-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://aaravsingh080.github.io/flowmedia/share-card.png">
+<link rel="canonical" href="https://aaravsingh080.github.io/flowmedia/">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"ProfessionalService","name":"Flow Media","url":"https://aaravsingh080.github.io/flowmedia/","image":"https://aaravsingh080.github.io/flowmedia/share-card.png","telephone":"+918146568904","description":"Cinematic content studio and A-to-Z brand partner in Ludhiana — shoots, reels, websites, apps, Meta ads, branding, events and AI-powered customer support.","address":{"@type":"PostalAddress","addressLocality":"Ludhiana","addressRegion":"Punjab","addressCountry":"IN"},"foundingDate":"2025-05-06","sameAs":["https://www.instagram.com/flowmedia.ldh/"],"priceRange":"₹₹"}</script>
 <style>
   @font-face {
     font-family: 'Bricolage Grotesque';
@@ -1249,8 +1258,37 @@
   .pc-note { font-size: 0.82rem; color: rgba(255, 255, 255, 0.55); margin: 18px 0 22px; }
   .plan-card .btn { width: 100%; justify-content: center; }
   .plan-card .btn + .btn { margin-top: 10px; }
+  .pc-form { display: flex; gap: 8px; margin-bottom: 10px; }
+  .pfi {
+    flex: 1; min-width: 0;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.28); border-radius: 10px;
+    padding: 13px 14px; color: #fff;
+    font-family: var(--body); font-size: 0.9rem;
+    outline: none; transition: border-color 0.25s;
+  }
+  .pfi:focus { border-color: var(--cyan); }
+  .pfi::placeholder { color: rgba(255, 255, 255, 0.4); }
+  .pc-mail {
+    display: block; text-align: center; margin-top: 12px;
+    font-size: 0.78rem; color: rgba(255, 255, 255, 0.5);
+  }
+  .pc-mail:hover { color: var(--cyan); }
   .btn-wa { background: #1fbf64; color: #fff; display: none; }
   .btn-wa.show { display: inline-flex; }
+
+  /* ============ film-cut transition ============ */
+  .cutfx { position: fixed; inset: 0; z-index: 86; pointer-events: none; visibility: hidden; }
+  .cutfx.go { visibility: visible; }
+  .cutfx .cb { position: absolute; left: 0; right: 0; height: 0; background: #04101f; }
+  .cutfx .ct { top: 0; }
+  .cutfx .cbm { bottom: 0; }
+  .cutfx.go .ct, .cutfx.go .cbm { animation: cutbar 0.85s cubic-bezier(0.76, 0, 0.24, 1); }
+  @keyframes cutbar { 0% { height: 0; } 42%, 58% { height: 50.5vh; } 100% { height: 0; } }
+  .cutfx .cfl { position: absolute; inset: 0; background: #fff; opacity: 0; }
+  .cutfx.go .cfl { animation: cutflash 0.85s linear; }
+  @keyframes cutflash { 0%, 40% { opacity: 0; } 47%, 53% { opacity: 0.9; } 60%, 100% { opacity: 0; } }
+  @media (prefers-reduced-motion: reduce) { .cutfx { display: none; } }
 
   /* ============ toast ============ */
   .toast {
@@ -1433,7 +1471,7 @@
               <li>Video editing</li>
               <li>Graphics</li>
             </ul>
-            <a class="fl-link" href="https://drive.google.com/drive/folders/1qxtwFeatgtGwfokqNZyq1bHLug9GAALK" target="_blank" rel="noopener" data-hot>Watch full portfolio →</a>
+            <a class="fl-link" href="work.html" data-hot>Watch full portfolio →</a>
           </div>
         </article>
         <article class="stack-card stack-media sc-sky" style="--i:1" data-reel="build">
@@ -1467,7 +1505,7 @@
               <li>Website development</li>
               <li>App development</li>
             </ul>
-            <a class="fl-link" href="https://drive.google.com/drive/folders/1qxtwFeatgtGwfokqNZyq1bHLug9GAALK" target="_blank" rel="noopener" data-hot>Watch full portfolio →</a>
+            <a class="fl-link" href="work.html" data-hot>Watch full portfolio →</a>
           </div>
         </article>
         <article class="stack-card stack-media sc-blue" style="--i:2" data-reel="grow">
@@ -1502,7 +1540,7 @@
               <li>Social media management</li>
               <li>Influencer marketing</li>
             </ul>
-            <a class="fl-link" href="https://drive.google.com/drive/folders/1qxtwFeatgtGwfokqNZyq1bHLug9GAALK" target="_blank" rel="noopener" data-hot>Watch full portfolio →</a>
+            <a class="fl-link" href="work.html" data-hot>Watch full portfolio →</a>
           </div>
         </article>
         <article class="stack-card sc-navy" style="--i:3">
@@ -1725,13 +1763,18 @@
         <div class="pc-type">For your <b id="pcType">business</b></div>
         <ul class="pc-list" id="pcList"><li class="pc-empty">Pick a business type or services to start…</li></ul>
         <p class="pc-note">Send it over — we reply within 24 hours with a custom plan and quote.</p>
-        <a class="btn btn-white magnetic" id="pcMail" href="mailto:hello@flowmedia.studio" data-hot>
+        <div class="pc-form">
+          <input class="pfi" id="pfName" type="text" placeholder="Your name" autocomplete="name" aria-label="Your name">
+          <input class="pfi" id="pfPhone" type="tel" placeholder="WhatsApp number" autocomplete="tel" aria-label="Your WhatsApp number">
+        </div>
+        <button class="btn btn-white magnetic" id="pfSend" data-hot>
           <span class="roll"><span>Send enquiry</span><span>Send enquiry</span></span>
           <span class="arrow">→</span>
-        </a>
+        </button>
         <a class="btn btn-wa magnetic" id="pcWa" href="#" target="_blank" rel="noopener" data-hot>
           <span class="roll"><span>WhatsApp us</span><span>WhatsApp us</span></span>
         </a>
+        <a class="pc-mail" id="pcMail" href="mailto:hello@flowmedia.studio">…or send your plan by email instead</a>
       </aside>
     </div>
   </section>
@@ -1761,6 +1804,7 @@
     </div>
     <div class="foot">
       <span>© 2025 Flow Media</span>
+      <a href="work.html" style="color: inherit;" data-hot>Our work</a>
       <a href="https://www.instagram.com/flowmedia.ldh/" target="_blank" rel="noopener" style="color: inherit;" data-hot>@flowmedia.ldh</a>
       <a href="https://wa.me/918146568904" target="_blank" rel="noopener" style="color: inherit;" data-hot>+91 81465 68904</a>
       <span>Est. 6 May 2025</span>
@@ -1799,6 +1843,8 @@
   </div>
   <div class="clap-flash"></div>
 </div>
+
+<div class="cutfx" id="cutfx" aria-hidden="true"><i class="cb ct"></i><i class="cb cbm"></i><span class="cfl"></span></div>
 
 <div class="toast" id="toast" role="status"></div>
 
@@ -1890,9 +1936,7 @@
   /* ---------- play badge ---------- */
   const playBtn = document.getElementById('playBtn');
   playBtn.setAttribute('aria-label', 'Watch our work — opens portfolio');
-  playBtn.addEventListener('click', () => {
-    window.open('https://drive.google.com/drive/folders/1qxtwFeatgtGwfokqNZyq1bHLug9GAALK', '_blank', 'noopener');
-  });
+  playBtn.addEventListener('click', () => { location.href = 'work.html'; });
 
   /* ---------- word splitter for mission fill ---------- */
   const fillEl = document.getElementById('fillText');
@@ -2575,6 +2619,7 @@
     m.dataset.name = name;
     m.addEventListener('click', (e) => {
       e.stopPropagation();
+      filmCut();
       scrollTo({ top: id === 'hero' ? 0 : document.getElementById(id).offsetTop, behavior: reduce ? 'auto' : 'smooth' });
     });
     scTrack.appendChild(m);
@@ -2751,6 +2796,56 @@
     body.appendChild(b);
   });
   planRender();
+
+  /* ---- real enquiry form (FormSubmit — activates on first send) ---- */
+  const pfSend = document.getElementById('pfSend');
+  const pfName = document.getElementById('pfName');
+  const pfPhone = document.getElementById('pfPhone');
+  pfSend.addEventListener('click', async () => {
+    const name = pfName.value.trim();
+    const phone = pfPhone.value.trim();
+    if (!name || !phone) { showToast('Add your name and WhatsApp number first'); return; }
+    pfSend.style.opacity = '0.55';
+    pfSend.style.pointerEvents = 'none';
+    try {
+      const r = await fetch('https://formsubmit.co/ajax/aaravsingh11224@gmail.com', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({ _subject: 'Flow Media enquiry — ' + name, _template: 'table', name, phone, plan: planMsg() }),
+      });
+      if (!r.ok) throw new Error('send failed');
+      showToast("Sent! We'll reply within 24 hours ✓");
+      pfName.value = ''; pfPhone.value = '';
+      if (window.goatcounter && goatcounter.count) goatcounter.count({ path: 'event/enquiry', event: true });
+    } catch (err) {
+      showToast('Could not send — opening email instead');
+      location.href = document.getElementById('pcMail').href;
+    }
+    pfSend.style.opacity = '';
+    pfSend.style.pointerEvents = '';
+  });
+
+  /* ---- film-cut transitions on in-page navigation ---- */
+  const cutfx = document.getElementById('cutfx');
+  function filmCut() {
+    if (reduce) return;
+    cutfx.classList.remove('go');
+    void cutfx.offsetWidth;
+    cutfx.classList.add('go');
+    setTimeout(() => cutfx.classList.remove('go'), 950);
+  }
+  document.querySelectorAll('nav .nlink, .menu a[href^="#"]').forEach((a) => a.addEventListener('click', filmCut));
+  document.getElementById('scRew').addEventListener('click', filmCut);
+  toTop.addEventListener('click', filmCut);
+
+  /* ---- analytics events (GoatCounter, if the account exists) ---- */
+  document.addEventListener('click', (e) => {
+    const a = e.target.closest('a[href]');
+    if (!a || !(window.goatcounter && goatcounter.count)) return;
+    if (a.href.includes('pricing.pdf')) goatcounter.count({ path: 'event/pricing', event: true });
+    else if (a.href.includes('wa.me')) goatcounter.count({ path: 'event/whatsapp', event: true });
+    else if (a.href.includes('work.html')) goatcounter.count({ path: 'event/portfolio', event: true });
+  });
 
   /* ---- before/after grade slider ---- */
   const ba = document.getElementById('ba');
@@ -3062,3 +3157,5 @@
   window.__fx = { update: (sy) => update(sy, 0.016), measure, M, flows: [heroFlow, ctaFlow], morphs: [heroMorph, missionMorph], shatter: stackShatter, setHero: (p, z) => { heroP = p; heroZ = z; } };
 })();
 </script>
+
+<script data-goatcounter="https://flowmedia.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
