@@ -656,6 +656,17 @@
   }
   .flap-r .fl-link:hover { text-decoration: underline; }
   .sc-blue .flap-r .fl-link { color: var(--cyan); }
+  .snd {
+    position: absolute; right: 14px; bottom: 14px; z-index: 4;
+    font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.14em;
+    background: rgba(6, 18, 41, 0.72); color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.35); border-radius: 999px;
+    padding: 9px 15px; cursor: pointer;
+    backdrop-filter: blur(6px);
+    transition: background 0.25s, border-color 0.25s;
+  }
+  .snd:hover { background: rgba(11, 95, 255, 0.85); }
+  .snd.on { background: var(--blue); border-color: var(--blue); }
   @media (max-width: 860px) {
     .flap-l {
       left: 0; right: 0; width: auto; height: auto; max-height: 48%;
@@ -2210,7 +2221,7 @@
     }
     buildTiles() {
       const { w, h } = this;
-      const base = w < 700 ? 56 : 44;
+      const base = w < 700 ? 64 : 54;
       this.tiles = [];
       let y = 0;
       while (y < h) {
@@ -2309,8 +2320,8 @@
         const tx = an.x + dk[0], ty = an.y + dk[1];
         const cx0 = tl.x + tl.tw / 2, cy0 = tl.y + tl.th / 2;
         const shrink = Math.min(1, fmp * 4);           // becomes a chip immediately
-        const size = tl.tw + (5.5 - tl.tw) * shrink;
-        let px = cx0 + (tx - cx0) * ex + Math.sin(fmp * 5 + tl.wp) * 16 * (1 - fmp);
+        const size = tl.tw + (4.5 - tl.tw) * shrink;
+        let px = cx0 + (tx - cx0) * ex + Math.sin(fmp * 5 + tl.wp) * 10 * (1 - fmp);
         let py = cy0 + (ty - cy0) * e + Math.sin(t * tl.wf + tl.wp) * 3 * (1 - e * 0.6);
         const rdx = px - mxL, rdy = py - myL;
         const rd2 = rdx * rdx + rdy * rdy;
@@ -2324,7 +2335,7 @@
         const cg2 = Math.round(tl.cg + (dk[3] - tl.cg) * e);
         const cb2 = Math.round(tl.cb + (dk[4] - tl.cb) * e);
         fg.fillStyle = 'rgb(' + cr + ',' + cg2 + ',' + cb2 + ')';
-        fg.globalAlpha = 0.28 + 0.62 * e;              // translucent in flight so showreels stay visible; solid when docked
+        fg.globalAlpha = 0.13 + 0.77 * e;              // barely-there in flight so showreels read clearly; solid when docked
         fg.fillRect(px - size / 2, py - size / 2, size, Math.max(3, size * 0.8));
       });
       fg.globalAlpha = 1;
@@ -2411,7 +2422,7 @@
   /* ---- showcase cards: videos + edge flaps ---- */
   // when the showreel files arrive: put them in the repo (e.g. media/create.mp4),
   // set the paths here, and the placeholders swap for playing video automatically.
-  const SHOWREELS = { create: '', build: '', grow: '' };
+  const SHOWREELS = { create: 'media/create.mp4', build: 'media/build.mp4', grow: 'media/grow.mp4' };
   const mediaCards = [...document.querySelectorAll('.stack-media')].map((el) => {
     const video = el.querySelector('.sc-video');
     const key = el.dataset.reel;
@@ -2423,9 +2434,31 @@
     const phCanvas = el.querySelector('.sc-ph canvas');
     const flow = (el.classList.contains('has-video') || !phCanvas) ? null
       : new Flow(phCanvas, { lines: 14, amp: 30, sparks: 24 });
-    return { el, video, flow, idx: stackCards.indexOf(el), open: false };
+    // sound chip: browsers only allow audio after a tap
+    let snd = null;
+    if (el.classList.contains('has-video')) {
+      snd = document.createElement('button');
+      snd.className = 'snd';
+      snd.textContent = '🔇 Tap for sound';
+      snd.setAttribute('data-hot', '');
+      el.querySelector('.sc-stage').appendChild(snd);
+      snd.addEventListener('click', () => {
+        const wasMuted = video.muted;
+        mediaCards.forEach((o) => {
+          if (o.video) o.video.muted = true;
+          if (o.snd) { o.snd.textContent = '🔇 Tap for sound'; o.snd.classList.remove('on'); }
+        });
+        if (wasMuted) {
+          video.muted = false;
+          snd.textContent = '🔊 Sound on';
+          snd.classList.add('on');
+          video.play().catch(() => {});
+        }
+      });
+    }
+    el.classList.add('open'); // flaps are out by default
+    return { el, video, flow, snd, idx: stackCards.indexOf(el), open: true, playing: false };
   });
-  if (reduce) mediaCards.forEach((mc) => mc.el.classList.add('open'));
 
   /* ---- film-timeline scrubber ---- */
   const scFill = document.getElementById('scFill');
@@ -2821,16 +2854,24 @@
       it.classList.toggle('hit', y < M.vh * 0.72);
     });
 
-    /* showcase cards: flaps open when the card pins */
-    if (!reduce) mediaCards.forEach((mc) => {
-      const st2 = 96 + mc.idx * 16;
+    /* showcase cards: flaps out by default, retract as the next card climbs in; videos run while visible */
+    mediaCards.forEach((mc) => {
       const r = mc.el.getBoundingClientRect();
-      const open = r.top <= st2 + 10 && r.bottom > M.vh * 0.35;
-      if (open !== mc.open) {
-        mc.open = open;
-        mc.el.classList.toggle('open', open);
-        if (mc.el.classList.contains('has-video')) {
-          if (open) mc.video.play().catch(() => {}); else mc.video.pause();
+      if (!reduce) {
+        const next = stackCards[mc.idx + 1];
+        const nextTop = next ? next.getBoundingClientRect().top : Infinity;
+        const open = nextTop > M.vh * 0.82;
+        if (open !== mc.open) {
+          mc.open = open;
+          mc.el.classList.toggle('open', open);
+        }
+      }
+      if (mc.el.classList.contains('has-video') && !reduce) {
+        const veil = parseFloat(mc.el.style.getPropertyValue('--veil')) || 0;
+        const vis = r.bottom > 60 && r.top < M.vh - 40 && veil < 0.3;
+        if (vis !== mc.playing) {
+          mc.playing = vis;
+          if (vis) mc.video.play().catch(() => {}); else mc.video.pause();
         }
       }
     });
