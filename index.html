@@ -1509,6 +1509,9 @@
         <span class="roll"><span>Start your project</span><span>Start your project</span></span>
         <span class="arrow">→</span>
       </a>
+      <a class="btn btn-big magnetic reveal" style="--d:.3s; background:#1fbf64; color:#fff; margin-left:12px;" href="https://wa.me/918146568904?text=Hi%20Flow%20Media!%20I%20want%20to%20start%20a%20project." target="_blank" rel="noopener" data-hot>
+        <span class="roll"><span>WhatsApp us</span><span>WhatsApp us</span></span>
+      </a>
     </div>
     <div class="wordmark" id="wordmark" aria-hidden="true">FLOW&nbsp;MEDIA</div>
     <div class="band2" aria-hidden="true">
@@ -1520,7 +1523,8 @@
     </div>
     <div class="foot">
       <span>© 2025 Flow Media</span>
-      <span>Create — Inspire — Grow</span>
+      <a href="https://www.instagram.com/flowmedia.ldh/" target="_blank" rel="noopener" style="color: inherit;" data-hot>@flowmedia.ldh</a>
+      <a href="https://wa.me/918146568904" target="_blank" rel="noopener" style="color: inherit;" data-hot>+91 81465 68904</a>
       <span>Est. 6 May 2025</span>
     </div>
   </section>
@@ -1647,9 +1651,9 @@
 
   /* ---------- play badge ---------- */
   const playBtn = document.getElementById('playBtn');
+  playBtn.setAttribute('aria-label', 'Watch our work — opens portfolio');
   playBtn.addEventListener('click', () => {
-    playBtn.classList.add('flip');
-    setTimeout(() => playBtn.classList.remove('flip'), 1600);
+    window.open('https://drive.google.com/drive/folders/1qxtwFeatgtGwfokqNZyq1bHLug9GAALK', '_blank', 'noopener');
   });
 
   /* ---------- word splitter for mission fill ---------- */
@@ -2260,7 +2264,7 @@
 
   /* ================= interactive features ================= */
   // set whatsapp to a full number like '919876543210' to enable the WhatsApp buttons
-  const CONTACT = { email: 'hello@flowmedia.studio', whatsapp: '' };
+  const CONTACT = { email: 'hello@flowmedia.studio', whatsapp: '918146568904' };
 
   /* ---- film-timeline scrubber ---- */
   const scFill = document.getElementById('scFill');
