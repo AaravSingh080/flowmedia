@@ -590,6 +590,52 @@
     z-index: 3;
   }
 
+  /* ---- gallery card: 3×3 hover grid ---- */
+  .stack-gallery { padding: clamp(18px, 2.4vw, 32px); }
+  .g9-head { display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap; margin: 6px 0 14px; }
+  .stack-gallery h3 { font-size: clamp(1.5rem, 2.6vw, 2.2rem); margin-bottom: 0; }
+  .g9-head p { color: var(--muted); font-size: 0.92rem; }
+  .g9 {
+    flex: 1; min-height: 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 10px;
+  }
+  .g9 img {
+    width: 100%; height: 100%; object-fit: cover;
+    border-radius: 14px;
+    position: relative;
+    transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.55s, border-radius 0.55s;
+    will-change: transform;
+    cursor: pointer;
+  }
+  .g9 img:hover {
+    transform: scale(1.14) translateY(-8px);
+    box-shadow: 0 26px 54px rgba(6, 18, 41, 0.38);
+    border-radius: 20px;
+    z-index: 5;
+  }
+  @media (max-width: 860px) {
+    .g9 { gap: 6px; }
+    .g9 img { border-radius: 10px; }
+  }
+
+  /* ---- hero video wall (inside the expanded showreel) ---- */
+  .frame-grid {
+    position: absolute; inset: 0; z-index: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 3px; background: #04101f;
+    opacity: 0; transition: opacity 0.9s ease;
+    pointer-events: none;
+  }
+  .frame.full .frame-grid { opacity: 1; }
+  .frame-grid video { width: 100%; height: 100%; object-fit: cover; }
+  .frame-ui { z-index: 2; }
+  .play-badge { z-index: 3; }
+
   /* ---- showcase cards: video stage + edge flaps ---- */
   .stack-media { padding: 0; }
   .sc-stage { position: absolute; inset: 0; background: var(--navy); }
@@ -1387,6 +1433,12 @@
       <div class="frame-seat">
         <div class="frame" id="frame">
           <canvas id="flowHero"></canvas>
+          <div class="frame-grid" id="frameGrid" aria-hidden="true">
+            <video muted loop playsinline preload="none" data-src="media/create.mp4"></video>
+            <video muted loop playsinline preload="none" data-src="media/build.mp4"></video>
+            <video muted loop playsinline preload="none" data-src="media/grow.mp4"></video>
+            <video muted loop playsinline preload="none" data-src="media/xero.mp4"></video>
+          </div>
           <div class="frame-ui" aria-hidden="true">
             <div class="row"><span>Showreel — Flow Media</span><span class="rec"><i></i>REC</span></div>
             <div class="row"><span id="frameTc">00:00:00:00</span><span>1920 × 1080 · 24 FPS</span></div>
@@ -1543,8 +1595,26 @@
             <a class="fl-link" href="work.html" data-hot>Watch full portfolio →</a>
           </div>
         </article>
-        <article class="stack-card sc-navy" style="--i:3">
-          <div class="sc-top"><span>04 / Run</span><span>Automate</span></div>
+        <article class="stack-card sc-paper stack-gallery" style="--i:3">
+          <div class="sc-top"><span>04 / Stills</span><span>Frame</span></div>
+          <div class="g9-head">
+            <h3>Designed to be seen</h3>
+            <p>Posts, carousels and collages we've designed for clients — hover any frame.</p>
+          </div>
+          <div class="g9">
+            <img src="media/g1.jpg" alt="Flow Media client design" loading="lazy">
+            <img src="media/g2.jpg" alt="Ambience social post design" loading="lazy">
+            <img src="media/g3.jpg" alt="Band section design" loading="lazy">
+            <img src="media/g4.jpg" alt="Carousel design" loading="lazy">
+            <img src="media/g5.jpg" alt="Carousel cover design" loading="lazy">
+            <img src="media/g6.jpg" alt="Drink post design" loading="lazy">
+            <img src="media/g7.jpg" alt="Instagram post design" loading="lazy">
+            <img src="media/g8.jpg" alt="Instagram post design" loading="lazy">
+            <img src="media/g9.jpg" alt="Instagram collage design" loading="lazy">
+          </div>
+        </article>
+        <article class="stack-card sc-navy" style="--i:4">
+          <div class="sc-top"><span>05 / Run</span><span>Automate</span></div>
           <div>
             <h3>Run</h3>
             <p class="sc-body">We keep working after the shoot wraps — events planned and staged on the ground, and AI answering your calls and chats around the clock.</p>
@@ -2528,6 +2598,8 @@
   const decos = [...document.querySelectorAll('[data-par]')];
   const frameTc = document.getElementById('frameTc');
   const heroCanvas = document.getElementById('flowHero');
+  const wallVids = [...document.querySelectorAll('#frameGrid video')];
+  let wallOn = false;
   const stackCards = [...document.querySelectorAll('.stack-card')];
   const steps = [...document.querySelectorAll('.step')];
   const trackCards = [...document.querySelectorAll('#track .card')];
@@ -3005,7 +3077,17 @@
       }
       frame.style.transform = `translateY(${ty}vh) scale(${scale}) rotateX(${rXf.toFixed(2)}deg) rotateY(${rYf.toFixed(2)}deg)`;
       frame.style.borderRadius = lerp(24, 0, e) + 'px';
-      frame.classList.toggle('full', z > 0.92);
+      const full = z > 0.92;
+      frame.classList.toggle('full', full);
+      if (full !== wallOn) {
+        wallOn = full;
+        wallVids.forEach((v) => {
+          if (full) {
+            if (!v.getAttribute('src')) v.src = v.dataset.src;
+            v.play().catch(() => {});
+          } else v.pause();
+        });
+      }
       heroCanvas.style.transform = `scale(${(1 + 0.08 * clamp01((p - 0.8) / 0.2)).toFixed(4)})`;
       const fade = clamp01(p / 0.22);
       heroCopy.style.opacity = 1 - fade;
