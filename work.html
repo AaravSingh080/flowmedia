@@ -150,6 +150,7 @@
     <button class="ftr on" data-f="all">All</button>
     <button class="ftr" data-f="food">Food</button>
     <button class="ftr" data-f="drinks">Drinks</button>
+    <button class="ftr" data-f="design">Design</button>
   </div>
 
   <div class="grid">
@@ -173,6 +174,51 @@
       <span class="shade"></span><span class="ply"></span>
       <span class="meta"><span class="cat">Drinks · Client reel</span><span class="ttl">Xero Degree</span></span>
     </button>
+    <button class="item rv" data-cat="design" data-img="media/g1.jpg" data-ttl="Pizza Feature — Design">
+      <img src="media/g1.jpg" alt="Pizza feature design" loading="lazy">
+      <span class="shade"></span>
+      <span class="meta"><span class="cat">Design · Post</span><span class="ttl">Pizza Feature</span></span>
+    </button>
+    <button class="item rv" style="--d:.03s" data-cat="design" data-img="media/g2.jpg" data-ttl="Ambience Post — Design">
+      <img src="media/g2.jpg" alt="Ambience post design" loading="lazy">
+      <span class="shade"></span>
+      <span class="meta"><span class="cat">Design · Post</span><span class="ttl">Ambience Post</span></span>
+    </button>
+    <button class="item rv" style="--d:.06s" data-cat="design" data-img="media/g3.jpg" data-ttl="Band Section — Design">
+      <img src="media/g3.jpg" alt="Band section design" loading="lazy">
+      <span class="shade"></span>
+      <span class="meta"><span class="cat">Design · Layout</span><span class="ttl">Band Section</span></span>
+    </button>
+    <button class="item rv" style="--d:.09s" data-cat="design" data-img="media/g4.jpg" data-ttl="Carousel II — Design">
+      <img src="media/g4.jpg" alt="Carousel design" loading="lazy">
+      <span class="shade"></span>
+      <span class="meta"><span class="cat">Design · Carousel</span><span class="ttl">Carousel II</span></span>
+    </button>
+    <button class="item rv" style="--d:.12s" data-cat="design" data-img="media/g5.jpg" data-ttl="Carousel — Design">
+      <img src="media/g5.jpg" alt="Carousel cover design" loading="lazy">
+      <span class="shade"></span>
+      <span class="meta"><span class="cat">Design · Carousel</span><span class="ttl">Carousel</span></span>
+    </button>
+    <button class="item rv" style="--d:.15s" data-cat="design" data-img="media/g6.jpg" data-ttl="Drink Post — Design">
+      <img src="media/g6.jpg" alt="Drink post design" loading="lazy">
+      <span class="shade"></span>
+      <span class="meta"><span class="cat">Design · Post</span><span class="ttl">Drink Post</span></span>
+    </button>
+    <button class="item rv" style="--d:.18s" data-cat="design" data-img="media/g7.jpg" data-ttl="Insta Post — Design">
+      <img src="media/g7.jpg" alt="Instagram post design" loading="lazy">
+      <span class="shade"></span>
+      <span class="meta"><span class="cat">Design · Post</span><span class="ttl">Insta Post</span></span>
+    </button>
+    <button class="item rv" style="--d:.21s" data-cat="design" data-img="media/g8.jpg" data-ttl="Insta Post II — Design">
+      <img src="media/g8.jpg" alt="Instagram post design" loading="lazy">
+      <span class="shade"></span>
+      <span class="meta"><span class="cat">Design · Post</span><span class="ttl">Insta Post II</span></span>
+    </button>
+    <button class="item rv" style="--d:.24s" data-cat="design" data-img="media/g9.jpg" data-ttl="Instagram Collage — Design">
+      <img src="media/g9.jpg" alt="Instagram collage design" loading="lazy">
+      <span class="shade"></span>
+      <span class="meta"><span class="cat">Design · Collage</span><span class="ttl">Instagram Collage</span></span>
+    </button>
     <a class="tile tile-drive rv" style="--d:.24s" href="https://drive.google.com/drive/folders/1qxtwFeatgtGwfokqNZyq1bHLug9GAALK" target="_blank" rel="noopener">
       <span class="big">🎞️</span>
       <span>Full archive on Google Drive ↗</span>
@@ -186,8 +232,9 @@
   </div>
 </main>
 
-<div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="Video player">
+<div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="Media viewer">
   <video id="lbv" controls playsinline></video>
+  <img id="lbi" alt="Design work" style="max-height: 88vh; max-width: 92vw; border-radius: 14px; box-shadow: 0 40px 120px rgba(0,0,0,0.6); display: none;">
   <button class="x" id="lbx" aria-label="Close">✕</button>
   <div class="cap" id="lbcap"></div>
 </div>
@@ -212,15 +259,27 @@
   const lb = document.getElementById('lb');
   const lbv = document.getElementById('lbv');
   const lbcap = document.getElementById('lbcap');
+  const lbi = document.getElementById('lbi');
   items.forEach((it) => it.addEventListener('click', () => {
-    lbv.src = it.dataset.src;
-    lbv.muted = false;
-    lbcap.textContent = it.dataset.ttl + ' — shot & edited by Flow Media';
+    const isImg = !!it.dataset.img;
+    lbv.style.display = isImg ? 'none' : '';
+    lbi.style.display = isImg ? 'block' : 'none';
+    if (isImg) {
+      lbv.pause();
+      lbv.removeAttribute('src');
+      lbi.src = it.dataset.img;
+      lbcap.textContent = it.dataset.ttl.replace(' — Design', '') + ' — designed by Flow Media';
+    } else {
+      lbi.removeAttribute('src');
+      lbv.src = it.dataset.src;
+      lbv.muted = false;
+      lbcap.textContent = it.dataset.ttl + ' — shot & edited by Flow Media';
+      lbv.play().catch(() => {});
+    }
     lb.classList.add('on');
-    lbv.play().catch(() => {});
-    if (window.goatcounter && window.goatcounter.count) goatcounter.count({ path: 'event/play-' + it.dataset.src.split('/').pop(), event: true });
+    if (window.goatcounter && window.goatcounter.count) goatcounter.count({ path: 'event/view-' + (it.dataset.img || it.dataset.src).split('/').pop(), event: true });
   }));
-  function closeLb() { lb.classList.remove('on'); lbv.pause(); lbv.src = ''; }
+  function closeLb() { lb.classList.remove('on'); lbv.pause(); lbv.removeAttribute('src'); lbi.removeAttribute('src'); }
   document.getElementById('lbx').addEventListener('click', closeLb);
   lb.addEventListener('click', (e) => { if (e.target === lb) closeLb(); });
   addEventListener('keydown', (e) => { if (e.key === 'Escape') closeLb(); });

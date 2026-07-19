@@ -191,6 +191,10 @@
   .btn:hover .arrow { transform: translateX(5px); }
   .btn-white { background: #fff; color: var(--navy); }
   .btn-white:hover { background: var(--cyan); color: var(--navy); }
+  .btn-navy { background: var(--navy); color: #fff; box-shadow: 0 8px 24px rgba(6, 18, 41, 0.28); transition: background 0.3s, box-shadow 0.3s; }
+  .btn-navy:hover { background: var(--blue); box-shadow: 0 12px 32px rgba(11, 95, 255, 0.38); }
+  .btn-line { background: transparent; border: 1.5px solid rgba(255, 255, 255, 0.45); color: #fff; transition: background 0.3s, border-color 0.3s; }
+  .btn-line:hover { background: rgba(255, 255, 255, 0.12); border-color: #fff; }
 
   /* ============ eyebrow / slate ============ */
   .slate {
@@ -1424,8 +1428,8 @@
             <span class="roll"><span>Start a project</span><span>Start a project</span></span>
             <span class="arrow">→</span>
           </a>
-          <a class="btn btn-ghost magnetic" href="#mission" data-hot>
-            <span class="roll"><span>See how we work</span><span>See how we work</span></span>
+          <a class="btn btn-navy magnetic" href="work.html" data-hot>
+            <span class="roll"><span>▶&nbsp; Watch our work</span><span>▶&nbsp; Watch our work</span></span>
           </a>
         </div>
       </div>
@@ -1863,6 +1867,9 @@
       <a class="btn btn-big magnetic reveal" style="--d:.3s; background:#1fbf64; color:#fff; margin-left:12px;" href="https://wa.me/918146568904?text=Hi%20Flow%20Media!%20I%20want%20to%20start%20a%20project." target="_blank" rel="noopener" data-hot>
         <span class="roll"><span>WhatsApp us</span><span>WhatsApp us</span></span>
       </a>
+      <a class="btn btn-line btn-big magnetic reveal" style="--d:.36s; margin-left:12px;" href="work.html" data-hot>
+        <span class="roll"><span>▶&nbsp; Watch our work</span><span>▶&nbsp; Watch our work</span></span>
+      </a>
     </div>
     <div class="wordmark" id="wordmark" aria-hidden="true">FLOW&nbsp;MEDIA</div>
     <div class="band2" aria-hidden="true">
@@ -2226,6 +2233,8 @@
     }
     draw(dt) {
       if (!this.visible || !this.groups.length) return;
+      const liveR = this.cv.parentElement.getBoundingClientRect();
+      if (Math.abs(liveR.height - this.h) > 2 || Math.abs(liveR.width - this.w) > 2) { this.resize(); return; }
       this.t += dt;
       const { g, w, h, t } = this;
       g.clearRect(0, 0, w, h);
@@ -2486,6 +2495,9 @@
     }
     draw(dt) {
       if (!this.visible || !this.tiles.length || !this.dock.length) return;
+      // self-heal: if the section's size drifted since sizing, rebuild instead of stretching
+      const liveR = this.wc.parentElement.getBoundingClientRect();
+      if (Math.abs(liveR.height - this.h) > 2 || Math.abs(liveR.width - this.w) > 2) { this.resize(); return; }
       this.t += dt;
       const { wg, fg, w, h, t } = this;
       const mp = clamp01(this.progress());
