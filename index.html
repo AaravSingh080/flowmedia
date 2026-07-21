@@ -2214,10 +2214,11 @@
       const mind = Math.min(this.w, this.h);
       const map = new Map();
       const pick = (arr, i) => arr[(i * 7919) % arr.length];
+      const qz = (v) => v > 240 ? 255 : Math.round(v / 51) * 51; // quantize colours → few draw batches
       for (let i = 0; i < N; i++) {
         const a = pick(A, i), b = pick(B, i);
-        const key = a[2] + ',' + a[3] + ',' + a[4] + '|' + b[2] + ',' + b[3] + ',' + b[4];
-        if (!map.has(key)) map.set(key, { ca: [a[2], a[3], a[4]], cb: [b[2], b[3], b[4]], p: [] });
+        const key = qz(a[2]) + ',' + qz(a[3]) + ',' + qz(a[4]) + '|' + qz(b[2]) + ',' + qz(b[3]) + ',' + qz(b[4]);
+        if (!map.has(key)) map.set(key, { ca: [qz(a[2]), qz(a[3]), qz(a[4])], cb: [qz(b[2]), qz(b[3]), qz(b[4])], p: [] });
         map.get(key).p.push({
           ax: a[0], ay: a[1], bx: b[0], by: b[1],
           x: a[0], y: a[1],
@@ -2257,11 +2258,14 @@
         for (let x = gap / 2; x < w; x += gap)
           for (let y = gap / 2; y < h; y += gap) g.fillRect(x, y, 2, 2);
       }
-      this.groups.forEach((gr) => {
+      this.groups.forEach((gr, gi) => {
         const cr = Math.round(gr.ca[0] + (gr.cb[0] - gr.ca[0]) * tE);
         const cg = Math.round(gr.ca[1] + (gr.cb[1] - gr.ca[1]) * tE);
         const cb = Math.round(gr.ca[2] + (gr.cb[2] - gr.ca[2]) * tE);
         g.fillStyle = 'rgb(' + cr + ',' + cg + ',' + cb + ')';
+        // one alpha + one batched fill per colour group instead of per particle
+        g.globalAlpha = Math.min(1, base * (0.82 + 0.18 * Math.sin(t * 1.4 + gi * 1.7)));
+        g.beginPath();
         gr.p.forEach((p) => {
           const ang = p.sa + mp * p.sr;
           let tx = p.ax + (p.bx - p.ax) * tE + Math.cos(ang) * p.sm * bell + Math.sin(t * p.wf + p.wp) * 1.6;
@@ -2276,10 +2280,10 @@
           }
           p.x += (tx - p.x) * k;
           p.y += (ty - p.y) * k;
-          g.globalAlpha = base * (0.75 + 0.25 * Math.sin(t * p.wf + p.wp));
           const s = p.s * (1 + bell * 0.7);
-          g.fillRect(p.x - s / 2, p.y - s / 2, s, s);
+          g.rect(p.x - s * 0.5, p.y - s * 0.5, s, s);
         });
+        g.fill();
       });
       g.globalAlpha = 1;
     }
@@ -2292,7 +2296,7 @@
 
   /* hero: play button → "PRESS PLAY" */
   const heroMorph = reduce ? null : new Morph(document.getElementById('heroBg'), {
-    cap: innerWidth < 700 ? 1500 : 2500,
+    cap: innerWidth < 700 ? 1000 : 1700,
     grid: true,
     progress: () => (heroP - 0.05) / 0.24,
     alphaMul: () => 1 - clamp01((heroZ - 0.7) / 0.28),
@@ -2326,7 +2330,7 @@
 
   /* mission: film reel → "CREATE. INSPIRE. GROW." */
   const missionMorph = reduce ? null : new Morph(document.getElementById('missionBg'), {
-    cap: innerWidth < 700 ? 1400 : 2600,
+    cap: innerWidth < 700 ? 950 : 1700,
     grid: false,
     progress: () => {
       const start = M.missionTop - M.vh * 0.85;
