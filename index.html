@@ -2265,7 +2265,7 @@
         const cb = Math.round(gr.ca[2] + (gr.cb[2] - gr.ca[2]) * tE);
         g.fillStyle = 'rgb(' + cr + ',' + cg + ',' + cb + ')';
         // one alpha + one batched fill per colour group instead of per particle
-        g.globalAlpha = Math.min(1, base * (0.82 + 0.18 * Math.sin(t * 1.4 + gi * 1.7)));
+        g.globalAlpha = Math.min(1, base * (0.92 + 0.08 * Math.sin(t * 1.4 + gi * 1.7)));
         g.beginPath();
         gr.p.forEach((p) => {
           const ang = p.sa + mp * p.sr;
@@ -2281,7 +2281,7 @@
           }
           p.x += (tx - p.x) * k;
           p.y += (ty - p.y) * k;
-          const s = p.s * (1 + bell * 0.7);
+          const s = p.s * (1 + bell * 0.7 + tE * 0.38); // bolder once the text forms
           g.rect(p.x - s * 0.5, p.y - s * 0.5, s, s);
         });
         g.fill();
@@ -2301,7 +2301,7 @@
     grid: true,
     progress: () => (heroP - 0.05) / 0.24,
     alphaMul: () => 1 - clamp01((heroZ - 0.7) / 0.28),
-    baseAlpha: (tE) => 0.32 + 0.58 * tE,
+    baseAlpha: (tE) => 0.36 + 0.6 * tE,
     drawSymbol: (g, w, h) => {
       const cx = w / 2, cy = h * 0.45, R = Math.min(w, h) * 0.33;
       g.lineWidth = Math.max(10, R * 0.10);
@@ -2331,7 +2331,7 @@
 
   /* mission: film reel → "CREATE. INSPIRE. GROW." */
   const missionMorph = reduce ? null : new Morph(document.getElementById('missionBg'), {
-    cap: innerWidth < 700 ? 950 : 1700,
+    cap: innerWidth < 700 ? 1100 : 2000,
     grid: false,
     progress: () => {
       const start = M.missionTop - M.vh * 0.85;
@@ -2339,7 +2339,7 @@
       return end > start ? (scrollY - start) / (end - start) : 1;
     },
     alphaMul: () => 1,
-    baseAlpha: (tE) => 0.30 + 0.65 * tE,
+    baseAlpha: (tE) => 0.34 + 0.66 * tE,
     drawSymbol: (g, w, h) => {
       const fr = fillEl.getBoundingClientRect();
       const sr = missionSec.getBoundingClientRect();
@@ -2364,7 +2364,7 @@
       const sr = missionSec.getBoundingClientRect();
       const bx = cr.left - sr.left, by = cr.top - sr.top;
       const bw = Math.max(100, cr.width), bh = Math.max(60, cr.height);
-      const words = [['CREATE.', '#0a1b33'], ['INSPIRE.', '#0b5fff'], ['GROW.', '#1794c4']];
+      const words = [['CREATE.', '#0a1b33'], ['INSPIRE.', '#0b5fff'], ['GROW.', '#0a76b4']];
       g.textBaseline = 'middle'; g.textAlign = 'left';
       if (w >= 860) {
         let size = bh * 0.85;
