@@ -195,6 +195,10 @@
   .btn-navy:hover { background: var(--blue); box-shadow: 0 12px 32px rgba(11, 95, 255, 0.38); }
   .btn-line { background: transparent; border: 1.5px solid rgba(255, 255, 255, 0.45); color: #fff; transition: background 0.3s, border-color 0.3s; }
   .btn-line:hover { background: rgba(255, 255, 255, 0.12); border-color: #fff; }
+  .cta-row {
+    display: flex; justify-content: center; align-items: center;
+    gap: 12px; flex-wrap: wrap;
+  }
 
   /* ============ eyebrow / slate ============ */
   .slate {
@@ -1861,16 +1865,18 @@
       <div class="slate reveal" style="color: var(--cyan);">Final scene — Your story</div>
       <h2 data-split>Ready when <span class="outline">you</span> are.</h2>
       <p class="sub reveal" style="--d:.16s">Let’s turn your vision into powerful content that drives growth, builds your brand, and leaves a lasting impression.</p>
-      <a class="btn btn-white btn-big magnetic reveal" style="--d:.24s" href="mailto:hello@flowmedia.studio?subject=Project%20enquiry%20—%20Flow%20Media" data-hot>
-        <span class="roll"><span>Start your project</span><span>Start your project</span></span>
-        <span class="arrow">→</span>
-      </a>
-      <a class="btn btn-big magnetic reveal" style="--d:.3s; background:#1fbf64; color:#fff; margin-left:12px;" href="https://wa.me/918146568904?text=Hi%20Flow%20Media!%20I%20want%20to%20start%20a%20project." target="_blank" rel="noopener" data-hot>
-        <span class="roll"><span>WhatsApp us</span><span>WhatsApp us</span></span>
-      </a>
-      <a class="btn btn-line btn-big magnetic reveal" style="--d:.36s; margin-left:12px;" href="work.html" data-hot>
-        <span class="roll"><span>▶&nbsp; Watch our work</span><span>▶&nbsp; Watch our work</span></span>
-      </a>
+      <div class="cta-row">
+        <a class="btn btn-white btn-big magnetic reveal" style="--d:.24s" href="mailto:hello@flowmedia.studio?subject=Project%20enquiry%20—%20Flow%20Media" data-hot>
+          <span class="roll"><span>Start your project</span><span>Start your project</span></span>
+          <span class="arrow">→</span>
+        </a>
+        <a class="btn btn-big magnetic reveal" style="--d:.3s; background:#1fbf64; color:#fff;" href="https://wa.me/918146568904?text=Hi%20Flow%20Media!%20I%20want%20to%20start%20a%20project." target="_blank" rel="noopener" data-hot>
+          <span class="roll"><span>WhatsApp us</span><span>WhatsApp us</span></span>
+        </a>
+        <a class="btn btn-line btn-big magnetic reveal" style="--d:.36s" href="work.html" data-hot>
+          <span class="roll"><span>▶&nbsp; Watch our work</span><span>▶&nbsp; Watch our work</span></span>
+        </a>
+      </div>
     </div>
     <div class="wordmark" id="wordmark" aria-hidden="true">FLOW&nbsp;MEDIA</div>
     <div class="band2" aria-hidden="true">
