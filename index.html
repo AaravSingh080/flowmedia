@@ -2402,10 +2402,6 @@
       this.t = Math.random() * 10;
       this.visible = true;
       this.tiles = [];
-      this.dock = [];
-      this.A = { x: 0, y: 0 };
-      this.B = { x: 0, y: 0 };
-      this.r = 100;
       new IntersectionObserver((es) => { this.visible = es[0].isIntersecting; }).observe(flyCv);
     }
     resize() {
@@ -2416,21 +2412,7 @@
       [this.wc, this.fc].forEach((cv) => { cv.width = this.w * dpr; cv.height = this.h * dpr; });
       this.wg.setTransform(dpr, 0, 0, dpr, 0, 0);
       this.fg.setTransform(dpr, 0, 0, dpr, 0, 0);
-      const vh = M.vh || 700;
-      const span = (M.stackMorphEnd || 0) - (M.stackMorphStart || 0);
-      this.r = Math.min(this.w * 0.24, vh * 0.30);
-      // assemble on the right…
-      this.A = {
-        x: Math.max(this.w * 0.58, this.w - this.r * 1.4 - 20),
-        y: ((M.stackMorphStart || 0) + span * 0.78) - (M.stackTop || 0) + vh * 0.5,
-      };
-      // …then drift slowly to centre
-      this.B = {
-        x: this.w / 2,
-        y: (M.stackMorphEnd || 0) - (M.stackTop || 0) + vh * 0.5,
-      };
       this.buildTiles();
-      this.buildDock();
     }
     buildTiles() {
       const { w, h } = this;
@@ -2458,48 +2440,12 @@
         y += rh;
       }
     }
-    buildDock() {
-      // countdown-leader skeleton sampled as offsets around (0,0) so it can travel
-      const r = this.r;
-      const s = Math.ceil(r * 2.6);
-      const oc = document.createElement('canvas');
-      oc.width = s; oc.height = s;
-      const og = oc.getContext('2d', { willReadFrequently: true });
-      const c = s / 2;
-      og.strokeStyle = '#0b5fff';
-      og.lineWidth = Math.max(7, r * 0.05);
-      og.beginPath(); og.arc(c, c, r, 0, 7); og.stroke();
-      og.strokeStyle = '#58c7f3';
-      og.lineWidth = Math.max(4, r * 0.03);
-      og.beginPath(); og.arc(c, c, r * 0.82, 0, 7); og.stroke();
-      og.strokeStyle = '#0a1b33';
-      og.lineWidth = Math.max(5, r * 0.035);
-      og.beginPath();
-      og.moveTo(c - r * 1.15, c); og.lineTo(c + r * 1.15, c);
-      og.moveTo(c, c - r * 1.15); og.lineTo(c, c + r * 1.15);
-      og.stroke();
-      const d = og.getImageData(0, 0, s, s).data;
-      this.dock = [];
-      for (let yy = 0; yy < s; yy += 5) {
-        for (let xx = 0; xx < s; xx += 5) {
-          const i = (yy * s + xx) * 4;
-          if (d[i + 3] > 120) this.dock.push([xx - c, yy - c, d[i], d[i + 1], d[i + 2]]);
-        }
-      }
-    }
     progress() {
       const span = (M.stackMorphEnd || 1) - (M.stackMorphStart || 0);
       return span > 0 ? (scrollY - M.stackMorphStart) / span : 0;
     }
-    anchorAt(mp) {
-      const d = mp <= 0.76 ? 0 : smoothstep(clamp01((mp - 0.76) / 0.24));
-      return {
-        x: this.A.x + (this.B.x - this.A.x) * d + Math.sin(this.t * 0.7) * 3,
-        y: this.A.y + (this.B.y - this.A.y) * d + Math.cos(this.t * 0.9) * 4,
-      };
-    }
     draw(dt) {
-      if (!this.visible || !this.tiles.length || !this.dock.length) return;
+      if (!this.visible || !this.tiles.length) return;
       // self-heal: if the section's size drifted since sizing, rebuild instead of stretching
       const liveR = this.wc.parentElement.getBoundingClientRect();
       if (Math.abs(liveR.height - this.h) > 2 || Math.abs(liveR.width - this.w) > 2) { this.resize(); return; }
@@ -2513,8 +2459,6 @@
         wg.fillRect(0, 0, w, h);
         return;
       }
-      const an = this.anchorAt(mp);
-      const dockLen = this.dock.length;
       let mxL = -9999, myL = -9999;
       if (fine && cx > -50) {
         const rct = this.fc.getBoundingClientRect();
@@ -2538,9 +2482,9 @@
         // detached — a small translucent chip on the layer above content
         const e = smoothstep(fmp);
         const ex = 1 - Math.pow(1 - fmp, 2.4);        // x races rightward first
-        const dk = this.dock[(i * 7919) % dockLen];
-        const tx = an.x + dk[0], ty = an.y + dk[1];
         const cx0 = tl.x + tl.tw / 2, cy0 = tl.y + tl.th / 2;
+        const tx = this.w + 90 + ((i * 37) % 260);     // chips stream clean off the right edge
+        const ty = cy0 + Math.sin(i * 2.7) * 110 * fmp;
         const shrink = Math.min(1, fmp * 4);           // becomes a chip immediately
         const size = tl.tw + (4.5 - tl.tw) * shrink;
         let px = cx0 + (tx - cx0) * ex + Math.sin(fmp * 5 + tl.wp) * 10 * (1 - fmp);
@@ -2557,46 +2501,13 @@
           const H = holes[hz];
           if (px > H.x - 8 && px < H.x + H.w + 8 && py > H.y - 8 && py < H.y + H.h + 8) return;
         }
-        const cr = Math.round(tl.cr + (dk[2] - tl.cr) * e);
-        const cg2 = Math.round(tl.cg + (dk[3] - tl.cg) * e);
-        const cb2 = Math.round(tl.cb + (dk[4] - tl.cb) * e);
+        const cr = Math.round(tl.cr + (11 - tl.cr) * e * 0.5);
+        const cg2 = Math.round(tl.cg + (95 - tl.cg) * e * 0.5);
+        const cb2 = Math.round(tl.cb + (255 - tl.cb) * e * 0.5);
         fg.fillStyle = 'rgb(' + cr + ',' + cg2 + ',' + cb2 + ')';
-        fg.globalAlpha = 0.13 + 0.77 * e;              // barely-there in flight so showreels read clearly; solid when docked
+        fg.globalAlpha = 0.24 * (1 - e * 0.3);         // subtle, fading as chips leave the frame
         fg.fillRect(px - size / 2, py - size / 2, size, Math.max(3, size * 0.8));
       });
-      fg.globalAlpha = 1;
-      this.drawOverlay(mp, an);
-    }
-    drawOverlay(mp, an) {
-      if (mp < 0.66) return;
-      const { fg } = this;
-      const r = this.r;
-      const a = clamp01((mp - 0.66) / 0.16);
-      const sub = clamp01((mp - 0.72) / 0.28);
-      const num = 3 - Math.min(2, Math.floor(sub * 3));
-      const swAng = -Math.PI / 2 + ((sub * 3) % 1) * Math.PI * 2;
-      fg.globalAlpha = a * 0.10;
-      fg.fillStyle = '#0b5fff';
-      fg.beginPath();
-      fg.moveTo(an.x, an.y);
-      fg.arc(an.x, an.y, r * 0.8, -Math.PI / 2, swAng);
-      fg.closePath();
-      fg.fill();
-      fg.globalAlpha = a;
-      fg.strokeStyle = '#0b5fff';
-      fg.lineWidth = 3;
-      fg.beginPath();
-      fg.moveTo(an.x, an.y);
-      fg.lineTo(an.x + Math.cos(swAng) * r * 0.8, an.y + Math.sin(swAng) * r * 0.8);
-      fg.stroke();
-      setFont(fg, Math.round(r * 0.85));
-      fg.textAlign = 'center';
-      fg.textBaseline = 'middle';
-      fg.fillStyle = '#0a1b33';
-      fg.fillText(String(num), an.x, an.y + r * 0.04);
-      fg.font = '600 ' + Math.max(11, Math.round(r * 0.07)) + 'px ui-monospace, Consolas, monospace';
-      fg.fillStyle = '#51617e';
-      fg.fillText('P I C T U R E   S T A R T', an.x, an.y + r * 1.32);
       fg.globalAlpha = 1;
     }
   }
